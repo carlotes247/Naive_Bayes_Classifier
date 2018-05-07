@@ -1,4 +1,9 @@
 #=======================
+#IMPORT DECLARATIONS
+#=======================
+import math
+
+#=======================
 #DEFINITION OF VARIABLES 
 #=======================
 
@@ -8,8 +13,12 @@ aritiesValues = []
 classValues = []
 # The probabilites of each class
 classProbabilitties = []
-# Path to load training dataset
+# Path to load the training dataset
 trainingDataPath = "traindata1.txt"
+
+#=======================
+#DEFINITION OF FUNCTIONS 
+#=======================
 
 # Separate training data into integer vectors (assumming is formatted as a string)
 def separateDataByVectors(dataset):
@@ -54,7 +63,19 @@ def separateDataByClass(dataset):
     # Debug the new order of classes
     print("New order of classValues: " + str(classesDataVector))
     return classesDataVector
-    
+
+# Simple mean calculation given a set of values    
+def mean (values):
+    return sum(values)/float(len(values))
+# Standard Deviation calculation
+def stdDeviation (values):
+    # We first calculate the mean
+    average = mean(values)
+    # We then use the mean to calculate the variance (using the N-1 bias correction because the mean is unknown)
+    variance = sum([pow(x-average,2) for x in values])/float(len(values)-1)
+    # return the square root of the variance (standard deviation)
+    return math.sqrt(variance)
+
         
 
 #=======================
@@ -87,4 +108,5 @@ with open(trainingDataPath) as traindata:
 print ("Arities values are: " + str(aritiesValues))
 print ("Class values are: " + str(classValues))
 classValues = separateDataByClass(classValues)
-
+numbers = [1,2,3,4,5]
+print("Summary of " + str(numbers) + " : mean=" + str(mean(numbers)) + " , stdDev=" + str(stdDeviation(numbers)))
