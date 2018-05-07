@@ -106,6 +106,7 @@ def stdDeviation (values):
 
 # Calculate mean and std Deviation for each attribute in a given list of class values
 def summariseAttributeValues(dataset):
+    # we assume we have the dataset of a class already
     # create the summaries of the attributes per class [mean, stdDeviation]
     summariesAttributes = [(mean(attribute), stdDeviation(attribute)) for attribute in zip(*dataset)]
     # remove the value for the class (making vector one position shorter) (position 0 is class value)
@@ -113,14 +114,13 @@ def summariseAttributeValues(dataset):
     # return summary with mean and std Deviation
     return summariesAttributes      
 
-#Summarises all attribute values (mean and std Deviation) per class
+#Summarises all attribute values (mean and std Deviation) per class (WE ASSUME THE DATASET IS ALREADY SEPARATED BETWEEN CLASSES)
 def summariseValuesByClass(dataset):
-    # We separate the data by classes
-    separatedClasses = separateDataByClass(dataset)
+    print("Summarising the following dataset: " + str(dataset))
     # Create the dictionary
     summariesClasses = {}
     # Fill dictionary per classValues iterating over the list of separatedClasses
-    for classValue, instances in separatedClasses.items():
+    for classValue, instances in dataset.items():
         # Get the summary (mean, std Deviation) for each attribute in the list
         summariesClasses[classValue] = summariseAttributeValues(instances)
     # Return the filled list of means and std deviations per classes
@@ -146,6 +146,10 @@ def calculateClassProbabilities(summariesAttributes, vector):
             mean, stdDeviation = classSummaries[i]
             # Declare x 
             x = vector[i]
+            # if vector[i] is still a vector...
+            if type(x) is list:
+                # we make sure to be checking the attribute values inside that vector
+                x = x[i+1]
             # calculate the class probability given all the data
             probabilities[classValue] *= calculateProbability(x, mean, stdDeviation)
     # return dictionary of class probabilities
@@ -201,7 +205,17 @@ print ("Arities training values are: " + str(aritiesValuesTrainingSet))
 print ("Class training values are: " + str(classValuesTrainingSet))
 classValuesTrainingSet = separateDataByClass(classValuesTrainingSet)
 
+print ("Arities test values are: " + str(aritiesValuesTestSet))
+print ("Class test values are: " + str(classValuesTestSet))
+classValuesTestSet = separateDataByClass(classValuesTestSet)
 
+
+# prepare model
+#summaries = summariseValuesByClass(classValuesTrainingSet)
+## test model
+#predictions = getPredictionsClasses(summaries, classValuesTestSet)
+#accuracy = getAccuracyClassification(classValuesTestSet, predictions)
+#print("Accuracy: " + str(accuracy))
 
 #numbers = [1,2,3,4,5]
 #print("Summary of " + str(numbers) + " : mean=" + str(mean(numbers)) + " , stdDev=" + str(stdDeviation(numbers)))
@@ -213,15 +227,24 @@ classValuesTrainingSet = separateDataByClass(classValuesTrainingSet)
 
 # code to test class summaries
 #dataset = [[1,1,20], [0,2,21], [1,3,22], [0,4,22]]
+#dataset = separateDataByClass(dataset)
 #summary = summariseValuesByClass(dataset)
-#print('Summary by class value: ' + str(summary))
+summary = summariseValuesByClass(classValuesTrainingSet)
+print('Summary by class value: ' + str(summary))
 
 # code to test probability of belonging to a class
 #x = 71.5
 #mean = 73
 #stdev = 6.2
 #probability = calculateProbability(x, mean, stdev)
-#print('Probability of belonging to this class: ' + str(probability))
+i = 1
+attribute = classValuesTrainingSet.get(0)[i]
+x = attribute[1]
+summaryAttribute = summary.get(0, 0)[i]
+mean = summaryAttribute[0]
+stdev = summaryAttribute[1]
+probability = calculateProbability(x, mean, stdev)
+print('Probability of belonging to this class: ' + str(probability))
 
 # code to test the class probabilities
 #summaries = {0:[(1, 0.5)], 1:[(20, 5.0)]}
@@ -242,7 +265,7 @@ classValuesTrainingSet = separateDataByClass(classValuesTrainingSet)
 #print('Predictions: ' + str(predictions))
 
 # code to test the accuracy of predictions
-testSet = [['a',1,1,1], ['a',2,2,2], ['b',3,3,3]]
-predictions = ['a', 'a', 'a']
-accuracy = getAccuracyClassification(testSet, predictions)
-print('Accuracy: ' + str(accuracy))
+#testSet = [['a',1,1,1], ['a',2,2,2], ['b',3,3,3]]
+#predictions = ['a', 'a', 'a']
+#accuracy = getAccuracyClassification(testSet, predictions)
+#print('Accuracy: ' + str(accuracy))
