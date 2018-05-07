@@ -8,6 +8,8 @@ aritiesValues = []
 classValues = []
 # The probabilites of each class
 classProbabilitties = []
+# Path to load training dataset
+trainingDataPath = "traindata1.txt"
 
 # Separate training data into integer vectors (assumming is formatted as a string)
 def separateDataByVectors(dataset):
@@ -34,7 +36,8 @@ def separateDataByVectors(dataset):
 
 # Separate training data between classes (assuming is formatted as integer vectors)
 def separateDataByClass(dataset):
-    classesDataVector = []
+    # declare dictionary for classes and values
+    classesDataVector = {}
     # We order the data in classes following the arity of the classes
     for i in range(aritiesValues[0]):
         # we go through the entire data in search for class arity i
@@ -42,9 +45,12 @@ def separateDataByClass(dataset):
             # Get the first vector in the list
             vector = dataset[j]
             # search for the class value i (first value is the class value)
-            if vector[0] == i:
+            if (vector[0] == i):
+                # create entry in dictionary according to i value
+                if i not in classesDataVector:
+                    classesDataVector[i] = []             
                 # we add this vector now to the list because it matches the class value we search for!
-                classesDataVector.append(vector)
+                classesDataVector[i].append(vector)
     # Debug the new order of classes
     print("New order of classValues: " + str(classesDataVector))
     return classesDataVector
@@ -56,7 +62,7 @@ def separateDataByClass(dataset):
 #=======================
 
 # load data from text files
-with open("traindata1.txt") as traindata:
+with open(trainingDataPath) as traindata:
     data = traindata.readlines()
 
     # Convert data into class vectors
