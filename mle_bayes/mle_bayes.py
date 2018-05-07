@@ -67,6 +67,7 @@ def separateDataByClass(dataset):
 # Simple mean calculation given a set of values    
 def mean (values):
     return sum(values)/float(len(values))
+
 # Standard Deviation calculation
 def stdDeviation (values):
     # We first calculate the mean
@@ -76,7 +77,63 @@ def stdDeviation (values):
     # return the square root of the variance (standard deviation)
     return math.sqrt(variance)
 
-        
+# Calculate mean and std Deviation for each attribute in a given list of class values
+def summariseAttributeValues(dataset):
+    # create the summaries of the attributes per class [mean, stdDeviation]
+    summariesAttributes = [(mean(attribute), stdDeviation(attribute)) for attribute in zip(*dataset)]
+    # remove the value for the class (making vector one position shorter) (position 0 is class value)
+    del summariesAttributes[0]
+    # return summary with mean and std Deviation
+    return summariesAttributes      
+
+#Summarises all attribute values (mean and std Deviation) per class
+def summariseValuesByClass(dataset):
+    # We separate the data by classes
+    separatedClasses = separateDataByClass(dataset)
+    # Create the dictionary
+    summariesClasses = {}
+    # Fill dictionary per classValues iterating over the list of separatedClasses
+    for classValue, instances in separatedClasses.items():
+        # Get the summary (mean, std Deviation) for each attribute in the list
+        summariesClasses[classValue] = summariseAttributeValues(instances)
+    # Return the filled list of means and std deviations per classes
+    return summariesClasses
+
+# Calculate the probability that a value belongs to a class using a gaussian function given an attribute value, mean and std deviation
+def calculateProbability(x, mean, stdDeviation):
+    # calculate the exponent 
+    exponent = math.exp(-(math.pow(x-mean,2)/(2*math.pow(stdDeviation,2))))
+    # return the probability
+    return (1 / (math.sqrt(2*math.pi) * stdDeviation)) * exponent
+
+def calculateClassProbabilities(summariesAttributes, vector):
+    # define the probabilities dictionary
+    probabilities = {}
+    # Go through the list of means and std deviations
+    for classValue, classSummaries in summariesAttributes.items():
+        # declare the entry for the classValue as an integer
+        probabilities[classValue] = 1
+        # go through the class summaries (mean and std deviation)
+        for i in range(len(classSummaries)):
+            # get mean and std deviation for each class
+            mean, stdDeviation = classSummaries[i]
+            # Declare x 
+            x = vector[i]
+            # calculate the class probability given all the data
+            probabilities[classValue] *= calculateProbability(x, mean, stdDeviation)
+    # return dictionary of class probabilities
+    return probabilities
+
+# Calculate class prediction based on the largest probability of a data instance belonging to a class
+def predictClass(summaries, inputVector):
+    probabilities = calculateClassProbabilities(summaries, inputVector)
+    bestLabel, bestProb = None, -1
+    for classValue, probability in probabilities.items():
+        if bestLabel is None or probability > bestProb:
+            bestProb = probability
+            bestLabel = classValue
+    return bestLabel
+
 
 #=======================
 #LOADING DATA FROM FILES 
@@ -109,4 +166,33 @@ print ("Arities values are: " + str(aritiesValues))
 print ("Class values are: " + str(classValues))
 classValues = separateDataByClass(classValues)
 numbers = [1,2,3,4,5]
-print("Summary of " + str(numbers) + " : mean=" + str(mean(numbers)) + " , stdDev=" + str(stdDeviation(numbers)))
+#print("Summary of " + str(numbers) + " : mean=" + str(mean(numbers)) + " , stdDev=" + str(stdDeviation(numbers)))
+
+# code to test attribute summaries
+#dataset = [[0,1,20], [1,2,21], [0,3,22]]
+#summary = summariseAttributeValues(dataset)
+#print('Attribute summaries: ' + str(summary))
+
+# code to test class summaries
+#dataset = [[1,1,20], [0,2,21], [1,3,22], [0,4,22]]
+#summary = summariseValuesByClass(dataset)
+#print('Summary by class value: ' + str(summary))
+
+# code to test probability of belonging to a class
+#x = 71.5
+#mean = 73
+#stdev = 6.2
+#probability = calculateProbability(x, mean, stdev)
+#print('Probability of belonging to this class: ' + str(probability))
+
+# code to test the class probabilities
+#summaries = {0:[(1, 0.5)], 1:[(20, 5.0)]}
+#inputVector = [1.1, '?']
+#probabilities = calculateClassProbabilities(summaries, inputVector)
+#print('Probabilities for each class: ' + str(probabilities))
+
+# code to test the predictions
+summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
+inputVector = [1.1, '?']
+result = predictClass(summaries, inputVector)
+print('Prediction: ' + str(result))
