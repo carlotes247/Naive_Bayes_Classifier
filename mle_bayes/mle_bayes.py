@@ -146,7 +146,19 @@ def getPredictionsClasses(summaries, testSet):
         predictions.append(result)
     # return list of class predictions
     return predictions
-    
+ 
+# Calculate the accuracy of predictions   
+def getAccuracyClassification(testSet, predictions):
+    # declare correct predictions counter
+    correctPredictions = 0
+    # go through the test dataset
+    for x in range(len(testSet)):
+        # if the class value of the testSet is equal to the predicted one...
+        if testSet[x][0] == predictions[x]:
+            # increase counter by one
+            correctPredictions += 1
+    # return accuracy as a percentage
+    return (correctPredictions/float(len(testSet))) * 100.0
 
 #=======================
 #LOADING DATA FROM FILES 
@@ -211,7 +223,13 @@ numbers = [1,2,3,4,5]
 #print('Prediction: ' + str(result))
 
 # code to test the getPredictions of entire dataset
-summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
-testSet = [[1.1, '?'], [19.1, '?']]
-predictions = getPredictionsClasses(summaries, testSet)
-print('Predictions: ' + str(predictions))
+#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
+#testSet = [[1.1, '?'], [19.1, '?']]
+#predictions = getPredictionsClasses(summaries, testSet)
+#print('Predictions: ' + str(predictions))
+
+# code to test the accuracy of predictions
+testSet = [['a',1,1,1], ['a',2,2,2], ['b',3,3,3]]
+predictions = ['a', 'a', 'a']
+accuracy = getAccuracyClassification(testSet, predictions)
+print('Accuracy: ' + str(accuracy))
