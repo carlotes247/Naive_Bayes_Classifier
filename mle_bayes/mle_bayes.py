@@ -8,17 +8,44 @@ import math
 #=======================
 
 # Arities (num of possible values) for each variable
-aritiesValues = []
+aritiesValuesTrainingSet = []
+aritiesValuesTestSet = []
 # The values of each class
-classValues = []
+classValuesTrainingSet = []
+classValuesTestSet = []
 # The probabilites of each class
 classProbabilitties = []
 # Path to load the training dataset
 trainingDataPath = "traindata1.txt"
+testDataPath = "testdata1.txt"
 
 #=======================
 #DEFINITION OF FUNCTIONS 
 #=======================
+
+# Loads data from a path and prepares dataset in vectors passed in
+def loadDataFromPath(path, aritiesVector, classValuesVector):
+    # load data from text files
+    with open(path) as traindata:
+        data = traindata.readlines()
+
+        # Convert data into class vectors
+        for line in range(len(data)):
+            # If it is the second line...
+            if line == 1:
+                # It is the line of arities
+                aritiesVector = separateDataByVectors(data[line])    
+                print ("Arities Values are: " + str(aritiesVector))
+            # if it is further than the second line...
+            if line > 1:
+                # it is the class values
+                auxClassValues = separateDataByVectors(data[line])
+                # we add rows of vectors into the classValues vector (C,x1,x2,x3)
+                classValuesVector.append(auxClassValues)
+                print ("Values per class are: " + str(auxClassValues))
+
+        # return both the aritiesVector and the classValuesVector
+        return aritiesVector, classValuesVector
 
 # Separate training data into integer vectors (assumming is formatted as a string)
 def separateDataByVectors(dataset):
@@ -48,7 +75,7 @@ def separateDataByClass(dataset):
     # declare dictionary for classes and values
     classesDataVector = {}
     # We order the data in classes following the arity of the classes
-    for i in range(aritiesValues[0]):
+    for i in range(aritiesValuesTrainingSet[0]):
         # we go through the entire data in search for class arity i
         for j in range(len(dataset)):
             # Get the first vector in the list
@@ -160,37 +187,23 @@ def getAccuracyClassification(testSet, predictions):
     # return accuracy as a percentage
     return (correctPredictions/float(len(testSet))) * 100.0
 
-#=======================
-#LOADING DATA FROM FILES 
-#=======================
-
-# load data from text files
-with open(trainingDataPath) as traindata:
-    data = traindata.readlines()
-
-    # Convert data into class vectors
-    for line in range(len(data)):
-        # If it is the second line...
-        if line == 1:
-            # It is the line of arities
-            aritiesValues = separateDataByVectors(data[line])    
-            print ("Arities Values are: " + str(aritiesValues))
-        # if it is further than the second line...
-        if line > 1:
-            # it is the class values
-            auxClassValues = separateDataByVectors(data[line])
-            # we add rows of vectors into the classValues vector (C,x1,x2,x3)
-            classValues.append(auxClassValues)
-            print ("Values per class are: " + str(auxClassValues))
 
 #=======================
 #MAIN PART OF THE CODE
 #=======================
 
-print ("Arities values are: " + str(aritiesValues))
-print ("Class values are: " + str(classValues))
-classValues = separateDataByClass(classValues)
-numbers = [1,2,3,4,5]
+# load training data set
+aritiesValuesTrainingSet, classValuesTrainingSet = loadDataFromPath(trainingDataPath, aritiesValuesTrainingSet, classValuesTrainingSet)
+# load test data set
+aritiesValuesTestSet, classValuesTestSet = loadDataFromPath(testDataPath, aritiesValuesTestSet, aritiesValuesTestSet)
+
+print ("Arities training values are: " + str(aritiesValuesTrainingSet))
+print ("Class training values are: " + str(classValuesTrainingSet))
+classValuesTrainingSet = separateDataByClass(classValuesTrainingSet)
+
+
+
+#numbers = [1,2,3,4,5]
 #print("Summary of " + str(numbers) + " : mean=" + str(mean(numbers)) + " , stdDev=" + str(stdDeviation(numbers)))
 
 # code to test attribute summaries
