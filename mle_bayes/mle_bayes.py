@@ -134,6 +134,19 @@ def predictClass(summaries, inputVector):
             bestLabel = classValue
     return bestLabel
 
+# Predict classes given a test dataset and a trained summary of means and std deviations
+def getPredictionsClasses(summaries, testSet):
+    # declare predictions list
+    predictions = []
+    # go through the test dataset
+    for i in range(len(testSet)):
+        # predict to which class is the entry in the set belonging to
+        result = predictClass(summaries, testSet[i])
+        # add result class to list
+        predictions.append(result)
+    # return list of class predictions
+    return predictions
+    
 
 #=======================
 #LOADING DATA FROM FILES 
@@ -192,7 +205,13 @@ numbers = [1,2,3,4,5]
 #print('Probabilities for each class: ' + str(probabilities))
 
 # code to test the predictions
+#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
+#inputVector = [1.1, '?']
+#result = predictClass(summaries, inputVector)
+#print('Prediction: ' + str(result))
+
+# code to test the getPredictions of entire dataset
 summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
-inputVector = [1.1, '?']
-result = predictClass(summaries, inputVector)
-print('Prediction: ' + str(result))
+testSet = [[1.1, '?'], [19.1, '?']]
+predictions = getPredictionsClasses(summaries, testSet)
+print('Predictions: ' + str(predictions))
