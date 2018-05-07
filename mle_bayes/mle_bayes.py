@@ -3,34 +3,34 @@
 #=======================
 
 # Arities (num of possible values) for each variable
-classArity = 0
-x1Arity = 0
-x2Arity = 0
-x3Arity = 0
+aritiesValues = []
 # The values of each class
-classValues = {}
-xValues = {}
+classValues = []
 # The probabilites of each class
-classProbabilitties = {}
+classProbabilitties = []
 
+# Separate training data into classes (assumming is formatted as a string)
+def separateDataByVectors(dataset):
+    vector = dataset
+    # declare the integer vector to return
+    vectorInt = []
+    # show status update
+    print ("Formatting data", end="")
+    # for each of the arities...
+    for entry in range(len(vector)):
+        # try to convert the value into an integer
+        try:
+            number = int(vector[entry])
+            vectorInt.append(number)                   
+        # if error... 
+        except:
+            # Print status update (it was not an integer value in the string)      
+            print (".", end="")
 
-
-# Separate training data into classes
-def separateDataByClass(dataset):
-    # create empty vector for the separated entry
-    separatedVector =[]  
-
-    # for i in range(dataset.lenght)
-    for i in range(len(dataset)):
-        # get the vector data of each line in the dataset
-        vectorData = dataset[i]
-        # if the entry -1 is not in the separated entry...
-        if (vectorData[-1] not in separatedVector):
-            # get the last attribute which will be the class value
-            separatedVector[vectorData[-1]] = []
-        separatedVector [vectorData[-1]].append(vectorData)
-
-    return separatedVector
+    # break line in console
+    print("")
+    #return integer vector
+    return vectorInt
 
 #=======================
 #LOADING DATA FROM FILES 
@@ -40,37 +40,26 @@ def separateDataByClass(dataset):
 with open("traindata1.txt") as traindata:
     data = traindata.readlines()
 
+    # Convert data into class vectors
     for line in range(len(data)):
         # If it is the second line...
         if line == 1:
             # It is the line of arities
-            vector = data[line]
-            print ("Arities are: " + data[line])
-            # for each of the arities...
-            for entry in range(len(vector)):
-                # if it is the first arity...
-                if entry == 0:
-                    # it is the class arity!
-                    print ("Class arity is " + vector[entry])
-                # if it is not the first entry...
-                else:
-                    # it is each of the class variables arities!
-                    print ("X" + str(entry) + " arity is " + vector[entry])
-
+            aritiesValues = separateDataByVectors(data[line])    
+            print ("Arities Values are: " + str(aritiesValues))
+        # if it is further than the second line...
         if line > 1:
-            print ("Values per class are: " + data[line])
-        #print (data[line])
-        #if line == 0 :
-        #    entry = line.split()
-        #    print (entry)
-        
-
-
+            # it is the class values
+            auxClassValues = separateDataByVectors(data[line])
+            # we add rows of vectors into the classValues vector (C,x1,x2,x3)
+            classValues.append(auxClassValues)
+            print ("Values per class are: " + str(auxClassValues))
 
 #=======================
 #MAIN PART OF THE CODE
 #=======================
 
-#print (separateDataByClass(data))
+print ("Arities values are: " + str(aritiesValues))
+print ("Class values are: " + str(classValues[6]))
 
 
