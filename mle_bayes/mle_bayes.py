@@ -16,8 +16,8 @@ classValuesTestSet = []
 # The probabilites of each class
 classProbabilitties = []
 # Path to load the training dataset
-trainingDataPath = "traindata1.txt"
-testDataPath = "testdata1.txt"
+trainingDataPath = "traindata2.txt"
+testDataPath = "testdata2.txt"
 
 #=======================
 #DEFINITION OF FUNCTIONS 
@@ -128,6 +128,8 @@ def summariseValuesByClass(dataset):
 
 # Calculate the probability that a value belongs to a class using a gaussian function given an attribute value, mean and std deviation
 def calculateProbability(x, mean, stdDeviation):
+    if stdDeviation == 0:
+        stdDeviation = 0.00001
     # calculate the exponent 
     exponent = math.exp(-(math.pow(x-mean,2)/(2*math.pow(stdDeviation,2))))
     # return the probability
@@ -142,16 +144,20 @@ def calculateClassProbabilities(summariesAttributes, vector):
         probabilities[classValue] = 1
         # go through the class summaries (mean and std deviation)
         for i in range(len(classSummaries)):
-            # get mean and std deviation for each class
+            # get mean and std deviation from the summary for each class entry
             mean, stdDeviation = classSummaries[i]
             # Declare x 
             x = vector[i]
             # if vector[i] is still a vector...
             if type(x) is list:
-                # we make sure to be checking the attribute values inside that vector
-                x = x[i+1]
-            # calculate the class probability given all the data
-            probabilities[classValue] *= calculateProbability(x, mean, stdDeviation)
+                # we make sure to be checking all the attribute values inside that vector
+                for j in range(len(x)):
+                    # access the attribute value for that class
+                    y = x[j]
+                    probabilities[classValue] *= calculateProbability(y, mean, stdDeviation)
+            # If it is not a list calculate the class probability given all the data
+            else:
+                probabilities[classValue] *= calculateProbability(x, mean, stdDeviation)
     # return dictionary of class probabilities
     return probabilities
 
@@ -159,6 +165,7 @@ def calculateClassProbabilities(summariesAttributes, vector):
 def predictClass(summaries, inputVector):
     probabilities = calculateClassProbabilities(summaries, inputVector)
     bestLabel, bestProb = None, -1
+    # select the max of the probabilities
     for classValue, probability in probabilities.items():
         if bestLabel is None or probability > bestProb:
             bestProb = probability
@@ -207,7 +214,7 @@ classValuesTrainingSet = separateDataByClass(classValuesTrainingSet)
 
 print ("Arities test values are: " + str(aritiesValuesTestSet))
 print ("Class test values are: " + str(classValuesTestSet))
-classValuesTestSet = separateDataByClass(classValuesTestSet)
+#classValuesTestSet = separateDataByClass(classValuesTestSet)
 
 
 # prepare model
@@ -229,14 +236,67 @@ classValuesTestSet = separateDataByClass(classValuesTestSet)
 #dataset = [[1,1,20], [0,2,21], [1,3,22], [0,4,22]]
 #dataset = separateDataByClass(dataset)
 #summary = summariseValuesByClass(dataset)
-summary = summariseValuesByClass(classValuesTrainingSet)
-print('Summary by class value: ' + str(summary))
+#summary = summariseValuesByClass(classValuesTrainingSet)
+#print('Summary by class value: ' + str(summary))
 
 # code to test probability of belonging to a class
 #x = 71.5
 #mean = 73
 #stdev = 6.2
 #probability = calculateProbability(x, mean, stdev)
+#i = 1
+#attribute = classValuesTrainingSet.get(0)[i]
+#x = attribute[1]
+#summaryAttribute = summary.get(0, 0)[i]
+#mean = summaryAttribute[0]
+#stdev = summaryAttribute[1]
+#probability = calculateProbability(x, mean, stdev)
+#print('Probability of belonging to this class: ' + str(probability))
+
+# code to test the class probabilities
+#summaries = {0:[(1, 0.5)], 1:[(20, 5.0)]}
+#inputVector = [1.1, '?']
+#probabilities = calculateClassProbabilities(summaries, inputVector)
+#probabilities = calculateClassProbabilities(summary, classValuesTestSet)
+#print('Probabilities for each class: ' + str(probabilities))
+
+# code to test the predictions
+#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
+#inputVector = [1.1, '?']
+#result = predictClass(summaries, inputVector)
+#result = predictClass(summary, classValuesTestSet)
+#print('Prediction: ' + str(result))
+
+# code to test the getPredictions of entire dataset
+#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
+#testSet = [[1.1, '?'], [19.1, '?']]
+#predictions = getPredictionsClasses(summaries, testSet)
+#predictions = getPredictionsClasses(summary, classValuesTestSet)
+#print('Predictions: ' + str(predictions))
+
+# code to test the accuracy of predictions
+#testSet = [['a',1,1,1], ['a',2,2,2], ['b',3,3,3]]
+#predictions = ['a', 'a', 'a']
+#accuracy = getAccuracyClassification(testSet, predictions)
+#accuracy = getAccuracyClassification(classValuesTestSet, predictions)
+#print('Accuracy: ' + str(accuracy))
+
+# prepare model
+summary = summariseValuesByClass(classValuesTrainingSet)
+
+# loop through the test Set and output probabilities per entry
+for i in range(len(classValuesTestSet)):
+    attribute = classValuesTestSet[i]
+    classValueAttribute = attribute [0]
+    summaryAttribute = summary.get(classValueAttribute, i)
+    # calculate class probability
+    resultClassProbability = calculateClassProbabilities(summary, attribute)
+    # predict class
+    resultClassPredicted = predictClass(summary, attribute)
+    # output result as specified in task submission
+    print ("P(C="+str(classValueAttribute)+" | X1="+str(attribute[1])+" | X2="+str(attribute[2])+" | X3="+str(attribute[3])+") = "+str(resultClassProbability)+" | Class Prediction="+str(resultClassPredicted))
+
+print("=================")
 i = 1
 attribute = classValuesTrainingSet.get(0)[i]
 x = attribute[1]
@@ -246,26 +306,8 @@ stdev = summaryAttribute[1]
 probability = calculateProbability(x, mean, stdev)
 print('Probability of belonging to this class: ' + str(probability))
 
-# code to test the class probabilities
-#summaries = {0:[(1, 0.5)], 1:[(20, 5.0)]}
-#inputVector = [1.1, '?']
-#probabilities = calculateClassProbabilities(summaries, inputVector)
-#print('Probabilities for each class: ' + str(probabilities))
 
-# code to test the predictions
-#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
-#inputVector = [1.1, '?']
-#result = predictClass(summaries, inputVector)
-#print('Prediction: ' + str(result))
-
-# code to test the getPredictions of entire dataset
-#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
-#testSet = [[1.1, '?'], [19.1, '?']]
-#predictions = getPredictionsClasses(summaries, testSet)
-#print('Predictions: ' + str(predictions))
-
-# code to test the accuracy of predictions
-#testSet = [['a',1,1,1], ['a',2,2,2], ['b',3,3,3]]
-#predictions = ['a', 'a', 'a']
-#accuracy = getAccuracyClassification(testSet, predictions)
-#print('Accuracy: ' + str(accuracy))
+predictions = getPredictionsClasses(summary, classValuesTestSet)
+accuracy = getAccuracyClassification(classValuesTestSet, predictions)
+print('Accuracy: ' + str(accuracy))
+# test model
