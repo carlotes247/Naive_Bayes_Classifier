@@ -7,6 +7,8 @@ import math
 #DEFINITION OF VARIABLES 
 #=======================
 
+# User Input string
+userInput = input("")
 # Arities (num of possible values) for each variable
 aritiesValuesTrainingSet = []
 aritiesValuesTestSet = []
@@ -16,14 +18,22 @@ classValuesTestSet = []
 # The probabilites of each class
 classProbabilitties = []
 # Path to load the training dataset
-trainingDataPath = "traindata1.txt"
-testDataPath = "testdata1.txt"
+trainingDataPath = ""
+testDataPath = ""
 # Flag for debug code
 debugFlag = False
+
 
 #=======================
 #DEFINITION OF FUNCTIONS 
 #=======================
+
+# Separation input string from user
+def separateInputUser(inputString):
+    # split entries by whitespaces
+    separatedString = inputString.split()
+    # return separated entries
+    return separatedString
 
 # Loads data from a path and prepares dataset in vectors passed in
 def loadDataFromPath(path, aritiesVector, classValuesVector):
@@ -203,12 +213,33 @@ def getAccuracyClassification(testSet, predictions):
     # return accuracy as a percentage
     return (correctPredictions/float(len(testSet))) * 100.0
 
+# Function to test the model following task specifications
+def testModel(testSet):
+    # loop through the test Set and output probabilities per entry
+    for i in range(len(testSet)):
+        attribute = testSet[i]
+        classValueAttribute = attribute [0]
+        summaryAttribute = summary.get(classValueAttribute, i)
+        # calculate class probability
+        resultClassProbability = calculateClassProbabilities(summary, attribute)
+        # predict class
+        resultClassPredicted = predictClass(summary, attribute)
+        # output result as specified in task submission
+        print ("P(C="+str(classValueAttribute)+" | X1="+str(attribute[1])+" | X2="+str(attribute[2])+" | X3="+str(attribute[3])+") = "+str(resultClassProbability)+" | Class Prediction="+str(resultClassPredicted))
+    return True
+
 
 #=======================
 #MAIN PART OF THE CODE
 #=======================
-print("Loading training and test data", end="")
+
+# formatting user input into strings
+pathsUserInput = separateInputUser(userInput)
+trainingDataPath = pathsUserInput[0]
+testDataPath = pathsUserInput[1]
+
 # load training data set
+print("Loading training and test data", end="")
 aritiesValuesTrainingSet, classValuesTrainingSet = loadDataFromPath(trainingDataPath, aritiesValuesTrainingSet, classValuesTrainingSet)
 # load test data set
 aritiesValuesTestSet, classValuesTestSet = loadDataFromPath(testDataPath, aritiesValuesTestSet, aritiesValuesTestSet)
@@ -226,20 +257,11 @@ print("=================")
 # prepare model
 summary = summariseValuesByClass(classValuesTrainingSet)
 
-# loop through the test Set and output probabilities per entry
-for i in range(len(classValuesTestSet)):
-    attribute = classValuesTestSet[i]
-    classValueAttribute = attribute [0]
-    summaryAttribute = summary.get(classValueAttribute, i)
-    # calculate class probability
-    resultClassProbability = calculateClassProbabilities(summary, attribute)
-    # predict class
-    resultClassPredicted = predictClass(summary, attribute)
-    # output result as specified in task submission
-    print ("P(C="+str(classValueAttribute)+" | X1="+str(attribute[1])+" | X2="+str(attribute[2])+" | X3="+str(attribute[3])+") = "+str(resultClassProbability)+" | Class Prediction="+str(resultClassPredicted))
+# test model
+testModel(classValuesTestSet)
 
 print("=================")
+# calculate accuracy classifier
 predictions = getPredictionsClasses(summary, classValuesTestSet)
 accuracy = getAccuracyClassification(classValuesTestSet, predictions)
 print('Accuracy: ' + str(accuracy))
-# test model
