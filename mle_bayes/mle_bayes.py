@@ -229,7 +229,6 @@ def testModel(testSet):
         print ("P(C="+str(classValueAttribute)+" | X1="+str(attribute[1])+" | X2="+str(attribute[2])+" | X3="+str(attribute[3])+") = "+str(resultClassProbability)+" | Class Prediction="+str(resultClassPredicted))
     return True
 
-
 #=======================
 #MAIN PART OF THE CODE
 #=======================
@@ -276,3 +275,10 @@ print("=================")
 predictions = getPredictionsClasses(summary, classValuesTestSet)
 accuracy = getAccuracyClassification(classValuesTestSet, predictions)
 print('Accuracy: ' + str(accuracy))
+
+#=======================
+#FURTHER IMPROVEMENTS
+#=======================
+# This naive bayes classifier could benefit from implementing 
+# the log floating point underflow fix, avoiding the small values 
+# in the conditional probabilities (as seen in the autumn term lectures)
