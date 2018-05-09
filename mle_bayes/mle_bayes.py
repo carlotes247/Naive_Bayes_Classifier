@@ -16,8 +16,10 @@ classValuesTestSet = []
 # The probabilites of each class
 classProbabilitties = []
 # Path to load the training dataset
-trainingDataPath = "traindata2.txt"
-testDataPath = "testdata2.txt"
+trainingDataPath = "traindata1.txt"
+testDataPath = "testdata1.txt"
+# Flag for debug code
+debugFlag = False
 
 #=======================
 #DEFINITION OF FUNCTIONS 
@@ -35,14 +37,16 @@ def loadDataFromPath(path, aritiesVector, classValuesVector):
             if line == 1:
                 # It is the line of arities
                 aritiesVector = separateDataByVectors(data[line])    
-                print ("Arities Values are: " + str(aritiesVector))
+                if debugFlag:
+                    print ("Arities Values are: " + str(aritiesVector))
             # if it is further than the second line...
             if line > 1:
                 # it is the class values
                 auxClassValues = separateDataByVectors(data[line])
                 # we add rows of vectors into the classValues vector (C,x1,x2,x3)
                 classValuesVector.append(auxClassValues)
-                print ("Values per class are: " + str(auxClassValues))
+                if debugFlag:
+                    print ("Values per class are: " + str(auxClassValues))
 
         # return both the aritiesVector and the classValuesVector
         return aritiesVector, classValuesVector
@@ -52,8 +56,9 @@ def separateDataByVectors(dataset):
     vector = dataset
     # declare the integer vector to return
     vectorInt = []
-    # show status update
-    print ("Formatting data", end="")
+    if debugFlag:   
+        # show status update
+        print ("Formatting data", end="")
     # for each of the arities...
     for entry in range(len(vector)):
         # try to convert the value into an integer
@@ -65,8 +70,6 @@ def separateDataByVectors(dataset):
             # Print status update (it was not an integer value in the string)      
             print (".", end="")
 
-    # break line in console
-    print("")
     #return integer vector
     return vectorInt
 
@@ -88,7 +91,8 @@ def separateDataByClass(dataset):
                 # we add this vector now to the list because it matches the class value we search for!
                 classesDataVector[i].append(vector)
     # Debug the new order of classes
-    print("New order of classValues: " + str(classesDataVector))
+    if debugFlag:    
+        print("New order of classValues: " + str(classesDataVector))
     return classesDataVector
 
 # Simple mean calculation given a set of values    
@@ -116,7 +120,8 @@ def summariseAttributeValues(dataset):
 
 #Summarises all attribute values (mean and std Deviation) per class (WE ASSUME THE DATASET IS ALREADY SEPARATED BETWEEN CLASSES)
 def summariseValuesByClass(dataset):
-    print("Summarising the following dataset: " + str(dataset))
+    if debugFlag:
+        print("Summarising the following dataset: " + str(dataset))
     # Create the dictionary
     summariesClasses = {}
     # Fill dictionary per classValues iterating over the list of separatedClasses
@@ -202,84 +207,21 @@ def getAccuracyClassification(testSet, predictions):
 #=======================
 #MAIN PART OF THE CODE
 #=======================
-
+print("Loading training and test data", end="")
 # load training data set
 aritiesValuesTrainingSet, classValuesTrainingSet = loadDataFromPath(trainingDataPath, aritiesValuesTrainingSet, classValuesTrainingSet)
 # load test data set
 aritiesValuesTestSet, classValuesTestSet = loadDataFromPath(testDataPath, aritiesValuesTestSet, aritiesValuesTestSet)
-
+print("")
+print("=================")
 print ("Arities training values are: " + str(aritiesValuesTrainingSet))
 print ("Class training values are: " + str(classValuesTrainingSet))
+print("Training classifier...")
 classValuesTrainingSet = separateDataByClass(classValuesTrainingSet)
-
+print("=================")
 print ("Arities test values are: " + str(aritiesValuesTestSet))
 print ("Class test values are: " + str(classValuesTestSet))
-#classValuesTestSet = separateDataByClass(classValuesTestSet)
-
-
-# prepare model
-#summaries = summariseValuesByClass(classValuesTrainingSet)
-## test model
-#predictions = getPredictionsClasses(summaries, classValuesTestSet)
-#accuracy = getAccuracyClassification(classValuesTestSet, predictions)
-#print("Accuracy: " + str(accuracy))
-
-#numbers = [1,2,3,4,5]
-#print("Summary of " + str(numbers) + " : mean=" + str(mean(numbers)) + " , stdDev=" + str(stdDeviation(numbers)))
-
-# code to test attribute summaries
-#dataset = [[0,1,20], [1,2,21], [0,3,22]]
-#summary = summariseAttributeValues(dataset)
-#print('Attribute summaries: ' + str(summary))
-
-# code to test class summaries
-#dataset = [[1,1,20], [0,2,21], [1,3,22], [0,4,22]]
-#dataset = separateDataByClass(dataset)
-#summary = summariseValuesByClass(dataset)
-#summary = summariseValuesByClass(classValuesTrainingSet)
-#print('Summary by class value: ' + str(summary))
-
-# code to test probability of belonging to a class
-#x = 71.5
-#mean = 73
-#stdev = 6.2
-#probability = calculateProbability(x, mean, stdev)
-#i = 1
-#attribute = classValuesTrainingSet.get(0)[i]
-#x = attribute[1]
-#summaryAttribute = summary.get(0, 0)[i]
-#mean = summaryAttribute[0]
-#stdev = summaryAttribute[1]
-#probability = calculateProbability(x, mean, stdev)
-#print('Probability of belonging to this class: ' + str(probability))
-
-# code to test the class probabilities
-#summaries = {0:[(1, 0.5)], 1:[(20, 5.0)]}
-#inputVector = [1.1, '?']
-#probabilities = calculateClassProbabilities(summaries, inputVector)
-#probabilities = calculateClassProbabilities(summary, classValuesTestSet)
-#print('Probabilities for each class: ' + str(probabilities))
-
-# code to test the predictions
-#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
-#inputVector = [1.1, '?']
-#result = predictClass(summaries, inputVector)
-#result = predictClass(summary, classValuesTestSet)
-#print('Prediction: ' + str(result))
-
-# code to test the getPredictions of entire dataset
-#summaries = {'A':[(1, 0.5)], 'B':[(20, 5.0)]}
-#testSet = [[1.1, '?'], [19.1, '?']]
-#predictions = getPredictionsClasses(summaries, testSet)
-#predictions = getPredictionsClasses(summary, classValuesTestSet)
-#print('Predictions: ' + str(predictions))
-
-# code to test the accuracy of predictions
-#testSet = [['a',1,1,1], ['a',2,2,2], ['b',3,3,3]]
-#predictions = ['a', 'a', 'a']
-#accuracy = getAccuracyClassification(testSet, predictions)
-#accuracy = getAccuracyClassification(classValuesTestSet, predictions)
-#print('Accuracy: ' + str(accuracy))
+print("=================")
 
 # prepare model
 summary = summariseValuesByClass(classValuesTrainingSet)
@@ -297,16 +239,6 @@ for i in range(len(classValuesTestSet)):
     print ("P(C="+str(classValueAttribute)+" | X1="+str(attribute[1])+" | X2="+str(attribute[2])+" | X3="+str(attribute[3])+") = "+str(resultClassProbability)+" | Class Prediction="+str(resultClassPredicted))
 
 print("=================")
-i = 1
-attribute = classValuesTrainingSet.get(0)[i]
-x = attribute[1]
-summaryAttribute = summary.get(0, 0)[i]
-mean = summaryAttribute[0]
-stdev = summaryAttribute[1]
-probability = calculateProbability(x, mean, stdev)
-print('Probability of belonging to this class: ' + str(probability))
-
-
 predictions = getPredictionsClasses(summary, classValuesTestSet)
 accuracy = getAccuracyClassification(classValuesTestSet, predictions)
 print('Accuracy: ' + str(accuracy))
