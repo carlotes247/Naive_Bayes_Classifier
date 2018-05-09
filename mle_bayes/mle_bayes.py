@@ -2,13 +2,14 @@
 #IMPORT DECLARATIONS
 #=======================
 import math
+import sys
 
 #=======================
 #DEFINITION OF VARIABLES 
 #=======================
 
 # User Input string
-userInput = input("")
+userInput = ""
 # Arities (num of possible values) for each variable
 aritiesValuesTrainingSet = []
 aritiesValuesTestSet = []
@@ -233,10 +234,20 @@ def testModel(testSet):
 #MAIN PART OF THE CODE
 #=======================
 
-# formatting user input into strings
-pathsUserInput = separateInputUser(userInput)
-trainingDataPath = pathsUserInput[0]
-testDataPath = pathsUserInput[1]
+# formatting user input into strings (only if the dataPaths are not hardcoded in the script)
+#pathsUserInput = separateInputUser(userInput)
+
+# If the loading paths are empty, read them from invocation of script
+if trainingDataPath == "" and testDataPath == "":
+    # We handle the case when the user is not prividing the right input
+    if len(sys.argv) > 1:
+        trainingDataPath = sys.argv[1]
+        testDataPath = sys.argv[2]
+    # If there are no arguments in the invocation, throw error
+    else:
+        raise ValueError("Training and Test sets path not specified in call!")
+else: 
+    print("Dataset paths are hardcoded!")
 
 # load training data set
 print("Loading training and test data", end="")
